@@ -11,10 +11,9 @@ from PyQt6.QtWidgets import (
     QPushButton, QTextEdit, QFileDialog, QComboBox,
     QListWidget, QProgressBar
 )
-from PyQt6.QtCore import Qt
+from PyQt6.QtCore import Qt, pyqtSignal
 
 
-# Steam accounts (passwords are base64 encoded)
 accounts = {
     'ruiiixx': 'UzY3R0JUQjgzRDNZ',
     'premexilmenledgconis': 'M3BYYkhaSmxEYg==',
@@ -24,14 +23,12 @@ accounts = {
     '787109690': 'SHVjVXhZTVFpZzE1'
 }
 
-# decode passwords
 passwords = {
     acc: base64.b64decode(accounts[acc]).decode('utf-8')
     for acc in accounts
 }
 
 
-# config file for saving the path
 CONFIG_FILE = "config.json"
 
 
@@ -51,6 +48,9 @@ def save_config(data):
 
 
 class App(QWidget):
+    update_queue_signal = pyqtSignal(int, str)
+    update_progress_signal = pyqtSignal(int)
+
     def __init__(self):
         super().__init__()
 
@@ -97,7 +97,6 @@ class App(QWidget):
 
         self.save_path = ""
 
-        # basic dark style
         self.setStyleSheet("""
             QWidget {
                 background-color: #1e1e1e;
@@ -126,12 +125,18 @@ class App(QWidget):
             }
         """)
 
-        # load saved path if it exists
         self.config = load_config()
 
         if "save_path" in self.config:
             self.save_path = self.config["save_path"]
             self.path_label.setText(self.save_path)
+
+        # connect signals
+        self.update_queue_signal.connect(self.update_queue)
+        self.update_progress_signal.connect(self.progress.setValue)
+
+    def update_queue(self, index, text):
+        self.queue.item(index).setText(text)
 
     def select_path(self):
         folder = QFileDialog.getExistingDirectory()
@@ -144,7 +149,11 @@ class App(QWidget):
 
     def run_download(self, pubfileid, index):
         exe = os.path.join("DepotdownloaderMod", "DepotDownloadermod.exe")
-        out = os.path.join(self.save_path, pubfileid)
+
+        target_folder = os.path.join(self.save_path, "projects", "myprojects")
+        os.makedirs(target_folder, exist_ok=True)
+
+        out = os.path.join(target_folder, pubfileid)
 
         command = [
             exe,
@@ -155,7 +164,7 @@ class App(QWidget):
             "-dir", out
         ]
 
-        self.queue.item(index).setText(f"Downloading: {pubfileid}")
+        self.update_queue_signal.emit(index, f"Downloading: {pubfileid}")
 
         try:
             process = subprocess.Popen(
@@ -168,23 +177,23 @@ class App(QWidget):
             for line in process.stdout:
                 match = re.search(r'(\d+)%', line)
                 if match:
-                    self.progress.setValue(int(match.group(1)))
+                    self.update_progress_signal.emit(int(match.group(1)))
 
             process.wait()
 
-            self.queue.item(index).setText(f"Done: {pubfileid}")
-            self.progress.setValue(100)
+            self.update_queue_signal.emit(index, f"Done: {pubfileid}")
+            self.update_progress_signal.emit(100)
 
         except:
-            self.queue.item(index).setText(f"Failed: {pubfileid}")
-            self.progress.setValue(0)
+            self.update_queue_signal.emit(index, f"Failed: {pubfileid}")
+            self.update_progress_signal.emit(0)
 
     def start_thread(self):
-        threading.Thread(target=self.process).start()
+        threading.Thread(target=self.process, daemon=True).start()
 
     def process(self):
         self.queue.clear()
-        self.progress.setValue(0)
+        self.update_progress_signal.emit(0)
 
         lines = self.links.toPlainText().splitlines()
         ids = []
