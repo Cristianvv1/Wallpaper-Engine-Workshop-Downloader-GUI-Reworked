@@ -45,3 +45,6 @@ https://github.com/SteamAutoCracks/WallpaperEngineWorkshopDownloader
 
 - Make sure the selected path is correct  
 - Some items may fail depending on availability
+
+
+Tutorial:https://youtu.be/oc8NAviKFD8
