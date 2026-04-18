@@ -6,7 +6,7 @@ This is a reworked version of the original project with small improvements and a
 
 ## Credits
 
-[Original project by SteamAutoCracks](https://github.com/SteamAutoCracks/WallpaperEngineWorkshopDownloader)
+[Original project by SteamAutoCracks](https://gitlab.com/steamautocracks/wallpaperengineworkshopdownloader)
 
 [Additional setup notes by jpgjm](https://github.com/Cristianvv1/Wallpaper-Engine-Workshop-Downloader-GUI-Reworked/issues/1)
 
@@ -19,7 +19,8 @@ This is a reworked version of the original project with small improvements and a
 ## Requirements
 
 * [DepotDownloaderMod](https://github.com/Cristianvv1/Wallpaper-Engine-Workshop-Downloader-GUI-Reworked/releases/tag/depotdownloadermod)
-* .NET 8.0 Runtime
+* [.NET 8.0 Runtime](https://aka.ms/dotnet-core-applaunch?framework=Microsoft.NETCore.App&framework_version=8.0.0&arch=x64&rid=win10-x64)
+* [.NET 9.0 Runtime](https://dotnet.microsoft.com/en-us/download/dotnet/thank-you/runtime-9.0.15-windows-x64-installer) 
 * Python 3.12
 * PyQt6
 
@@ -27,7 +28,9 @@ This is a reworked version of the original project with small improvements and a
 
 1. [Install .NET 8.0 Runtime](https://aka.ms/dotnet-core-applaunch?framework=Microsoft.NETCore.App&framework_version=8.0.0&arch=x64&rid=win10-x64)
 
-2. Install Python
+2. [Install .NET 9.0 Runtime](https://dotnet.microsoft.com/en-us/download/dotnet/thank-you/runtime-9.0.15-windows-x64-installer) 
+
+3. Install Python
 
 You can install it manually or use this command:
 
@@ -36,7 +39,7 @@ curl -o python-installer.exe https://www.python.org/ftp/python/3.12.2/python-3.1
 .\python-installer.exe /quiet InstallAllUsers=1 PrependPath=1
 ```
 
-3. Install PyQt6
+4. Install PyQt6
 
 ```
 python -m pip install PyQt6
